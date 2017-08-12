@@ -32,7 +32,7 @@ for(let k = 1; k < 20; k++) {
   MAP['f' + k] = 111 + k;
 }
 
-export default function code(x) {
+export function code(x) {
   return MAP[x] || x.toUpperCase().charCodeAt(0);
 }
 

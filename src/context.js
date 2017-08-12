@@ -1,4 +1,4 @@
-import { getKeys, getMods, modifiersMatch } from './code';
+import { code, getKeys, getMods, modifiersMatch } from './code';
 
 export default class Context {
   constructor(context, master, options = {}) {
@@ -13,6 +13,7 @@ export default class Context {
     if (this._paused) {
       return false;
     }
+    console.log(event)
 
     let key = event.keyCode;
 

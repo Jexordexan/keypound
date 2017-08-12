@@ -1,33 +1,43 @@
 import Context from './context'
 
-export class Keypound {
+export default class Keypound {
   constructor() {
     this.stack = [];
-    document.addEventListener('keypress', (event) => this.onKeyPress(event))
+    document.addEventListener('keydown', (event) => this.onKeyPress(event))
   }
   enter(contextName, options) {
-    const i = this.stack.findIndex(c => c.context === contextName)
+    let context = null;
+    console.log(this.stack);
+    const i = this.stack.findIndex(c => c.name === contextName);
     if (i > -1) {
-      this.moveToTop(i);
+      context = this.moveToTop(i);
     } else {
-      this.stack.push(new Context(contextName, this, options))
+      context = this.enterNewContext(contextName, options);
     }
+    return context;
   }
   exit(contextName) {
     const i = this.stack.findIndex(c => c.context === contextName)
     if (i > -1) {
-      this.stack[i] = null
+      this.stack.splice(index, 1)
     }
   }
   onKeyPress(event) {
-    const keyCode = event.keyCodes;
-    let i = this.stack.length;
-    let handled = false;
+    const keyCode = event.keyCodes
+    let i = this.stack.length
+    let handled = false
     while (!handled && i--) {
-      handled = this.stack[i].__dispatch(event);
+      handled = this.stack[i].__dispatch(event)
     }
   }
   moveToTop(index) {
-    this.stack.push(this.stack.splice(index, 1));
+    const context = this.stack.splice(index, 1);
+    this.stack.push(context);
+    return context;
+  }
+  enterNewContext(name, options) {
+    const context = new Context(name, this, options);
+    this.stack.push(context);
+    return context;
   }
 }

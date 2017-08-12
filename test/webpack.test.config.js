@@ -1,16 +1,17 @@
 // This is the webpack config used for unit tests.
-
+var path = require('path')
 // var utils = require('./utils')
 var webpack = require('webpack')
 var merge = require('webpack-merge')
 var baseConfig = require('../webpack.config')
 
 var webpackConfig = merge(baseConfig, {
-  // use inline sourcemap for karma-sourcemap-loader
-  // module: {
-  //   rules: utils.styleLoaders()
-  // },
   devtool: '#inline-source-map',
+  resolve: {
+    alias: {
+      'src': path.resolve('src')
+    }
+  },
   plugins: [
     new webpack.DefinePlugin({
       'process.env': '"testing"'
