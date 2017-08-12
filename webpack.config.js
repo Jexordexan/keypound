@@ -7,6 +7,7 @@ module.exports = {
     libraryTarget: 'umd',
     filename: "keypound.js"
   },
+  devtool: '#cheap-module-eval-source-map',
   module: {
     loaders: [
       { 
