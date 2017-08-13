@@ -12,6 +12,8 @@ export const MODIFIER_MAP = {
   91:'metaKey'
 };
 
+export const MODIFIER_LIST = Object.keys(MODIFIER_MAP).map(code => MODIFIER_MAP[code]);
+
 // special keys
 export const MAP = {
   backspace: 8, tab: 9, clear: 12,
@@ -53,7 +55,7 @@ export function getMods(key) {
     ctrlKey: false,
     metaKey: false
   }
-  key.slice(0, key.length - 1).forEach(mod => {
+  key.slice(0, -1).forEach(mod => {
     const keyCode = MODIFIERS[mod];
     const modName = MODIFIER_MAP[keyCode];
     _mods[modName] = true;
@@ -62,8 +64,5 @@ export function getMods(key) {
 }
 
 export function modifiersMatch(mods, event) {
-  Object.keys(MODIFIER_MAP).forEach(modName => {
-    if (mods[modName] !== event[modName]) return false;
-  })
-  return true;
+  return MODIFIER_LIST.every(modName => mods[modName] == event[modName]);
 }

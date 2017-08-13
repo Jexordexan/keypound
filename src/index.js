@@ -7,7 +7,6 @@ export default class Keypound {
   }
   enter(contextName, options) {
     let context = null;
-    console.log(this.stack);
     const i = this.stack.findIndex(c => c.name === contextName);
     if (i > -1) {
       context = this.moveToTop(i);

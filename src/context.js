@@ -13,7 +13,6 @@ export default class Context {
     if (this._paused) {
       return false;
     }
-    console.log(event)
 
     let key = event.keyCode;
 
@@ -34,8 +33,8 @@ export default class Context {
     keys.forEach(key => {
       let mods = [];
       key = key.split('+');
+      mods = getMods(key);
       if (key.length > 1){
-        mods = getMods(key);
         key = [key[key.length-1]];
       }
       key = key[0]
@@ -51,7 +50,7 @@ export default class Context {
 
   off(shortcut) {
     if (shortcut) {
-      delete this.bindings[shortcut];
+      delete this._bindings[code(shortcut)];
     }
   }
 
