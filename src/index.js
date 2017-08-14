@@ -30,7 +30,7 @@ export default class Keypound {
     }
   }
   moveToTop(index) {
-    const context = this.stack.splice(index, 1);
+    const [context] = this.stack.splice(index, 1);
     this.stack.push(context);
     return context;
   }

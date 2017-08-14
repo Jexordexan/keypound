@@ -54,7 +54,7 @@ export default class Context {
   }
 
   exit() {
-    this._master.exit(this.context);
+    this._master.exit(this.name);
   }
 
   pause() {

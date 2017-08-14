@@ -39,9 +39,11 @@ export function code(x) {
 }
 
 export function getKeys(key) {
-  const keys = key.replace(/\s/g, '').split(',');
-  if ((keys[keys.length - 1]) === '') {
-    keys[keys.length - 2] += ',';
+  let keys = key.replace(/\s/g, '').split(',');
+  const last = keys.length - 1;
+  if ((keys[last]) === '') {
+    keys[last - 1] += ',';
+    keys = keys.slice(0, -1);
   }
   return keys;
 }

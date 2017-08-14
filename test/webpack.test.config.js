@@ -6,7 +6,7 @@ const merge = require('webpack-merge');
 const baseConfig = require('../webpack.config');
 
 const webpackConfig = merge(baseConfig, {
-  devtool: '#inline-source-map',
+  devtool: 'inline-source-map',
   resolve: {
     alias: {
       'src': path.resolve('src'),
@@ -14,10 +14,24 @@ const webpackConfig = merge(baseConfig, {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env': '"testing"',
+      'process.env': '"test"',
     }),
-  ],
+  ]
 });
+
+webpackConfig.module.loaders.push({
+  enforce: 'post',
+  test: /\.js$/,
+  use: {
+    loader: 'istanbul-instrumenter-loader',
+    options: { esModules: true }
+  },
+  include: path.resolve('src'),
+  exclude: [
+    /\.spec\.js$/,
+    /node_modules/
+  ]
+})
 
 // no need for app entry during tests
 delete webpackConfig.entry;

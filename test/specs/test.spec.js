@@ -75,7 +75,32 @@ describe('Keypound', () => {
     bspy1.calls.reset();
     bspy2.calls.reset();
 
-    master.exit('floor2');
+    floor2.exit();
+    keyPress(code('b'));
+    expect(bspy1).toHaveBeenCalled();
+    expect(bspy2).not.toHaveBeenCalled();
+  });
+
+  it('should trigger an event after being re-entered', () => {
+    floor1 = master.enter('floor1');
+    const bspy1 = jasmine.createSpy('bpress1');
+    floor1.on('b', e => bspy1(e));
+    keyPress(code('b'));
+    expect(bspy1).toHaveBeenCalled();
+
+    bspy1.calls.reset();
+    const bspy2 = jasmine.createSpy('bpress2');
+
+    floor2 = master.enter('floor2');
+    floor2.on('b', e => bspy2(e));
+    keyPress(code('b'));
+    expect(bspy1).not.toHaveBeenCalled();
+    expect(bspy2).toHaveBeenCalled();
+
+    bspy1.calls.reset();
+    bspy2.calls.reset();
+
+    master.enter('floor1');
     keyPress(code('b'));
     expect(bspy1).toHaveBeenCalled();
     expect(bspy2).not.toHaveBeenCalled();

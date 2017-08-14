@@ -11,9 +11,9 @@ describe('Utilities', () => {
   });
 
   it('should return the correct key bindings', () => {
-    const key = 'p, ctrl + v, control + alt + delete';
+    const key = 'p, ctrl + v, control + alt + delete, shift + ,';
     const keys = getKeys(key);
-    expect(keys).toEqual(['p', 'ctrl+v', 'control+alt+delete']);
+    expect(keys).toEqual(['p', 'ctrl+v', 'control+alt+delete', 'shift+,']);
     const keyArray1 = keys[1].split('+');
     const keyArray2 = keys[2].split('+');
     const mods1 = getMods(keyArray1);
