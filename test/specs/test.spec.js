@@ -118,4 +118,15 @@ describe('Keypound', () => {
     keyPress(code('b'));
     expect(bspy1).toHaveBeenCalled();
   });
+
+  it('should trigger if shortcut is unique', () => {
+    floor1 = master.enter('floor1');
+    floor2 = master.enter('floor2');
+    const bspy1 = jasmine.createSpy('bpress1');
+    const bspy2 = jasmine.createSpy('bpress2');
+    floor1.on('b', e => bspy1(e));
+    floor2.on('ctrl + b', e => bspy2(e));
+    keyPress(code('b'));
+    expect(bspy1).toHaveBeenCalled();
+  });
 });
