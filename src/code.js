@@ -2,17 +2,17 @@ export const MODIFIERS = {
   '⇧': 16, shift: 16,
   '⌥': 18, alt: 18, option: 18,
   '⌃': 17, ctrl: 17, control: 17,
-  '⌘': 91, command: 91
-}
-
-export const MODIFIER_MAP = {
-  16:'shiftKey',
-  18:'altKey',
-  17:'ctrlKey',
-  91:'metaKey'
+  '⌘': 91, command: 91,
 };
 
-export const MODIFIER_LIST = Object.keys(MODIFIER_MAP).map(code => MODIFIER_MAP[code]);
+export const MODIFIER_MAP = {
+  16: 'shiftKey',
+  18: 'altKey',
+  17: 'ctrlKey',
+  91: 'metaKey',
+};
+
+export const MODIFIER_LIST = Object.keys(MODIFIER_MAP).map(keyCode => MODIFIER_MAP[keyCode]);
 
 // special keys
 export const MAP = {
@@ -27,17 +27,16 @@ export const MAP = {
   ',': 188, '.': 190, '/': 191,
   '`': 192, '-': 189, '=': 187,
   ';': 186, '\'': 222,
-  '[': 219, ']': 221, '\\': 220
-}
+  '[': 219, ']': 221, '\\': 220,
+};
 
-for(let k = 1; k < 20; k++) {
+for (let k = 1; k < 20; k++) {
   MAP['f' + k] = 111 + k;
 }
 
 export function code(x) {
   return MAP[x] || x.toUpperCase().charCodeAt(0);
 }
-
 
 export function getKeys(key) {
   const keys = key.replace(/\s/g, '').split(',');
@@ -53,8 +52,8 @@ export function getMods(key) {
     shiftKey: false,
     altKey: false,
     ctrlKey: false,
-    metaKey: false
-  }
+    metaKey: false,
+  };
   key.slice(0, -1).forEach(mod => {
     const keyCode = MODIFIERS[mod];
     const modName = MODIFIER_MAP[keyCode];

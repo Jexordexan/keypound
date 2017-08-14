@@ -14,7 +14,7 @@ export default class Context {
       return false;
     }
 
-    let key = event.keyCode;
+    const key = event.keyCode;
 
     if (!(key in this._bindings)) {
       return this.block;
@@ -29,15 +29,15 @@ export default class Context {
   }
 
   on(shortcut, handler, options) {
-    let keys = getKeys(shortcut);
+    const keys = getKeys(shortcut);
     keys.forEach(key => {
       let mods = [];
       key = key.split('+');
       mods = getMods(key);
-      if (key.length > 1){
-        key = [key[key.length-1]];
+      if (key.length > 1) {
+        key = [key[key.length - 1]];
       }
-      key = key[0]
+      key = key[0];
       key = code(key);
 
       if (!(key in this._bindings)) {
@@ -45,7 +45,7 @@ export default class Context {
       }
 
       this._bindings[key].push({ key, handler, mods });
-    })
+    });
   }
 
   off(shortcut) {

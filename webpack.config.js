@@ -10,8 +10,14 @@ module.exports = {
   devtool: '#cheap-module-eval-source-map',
   module: {
     loaders: [
-      { 
-        test: /\.js$/, 
+      {
+        enforce: "pre",
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: "eslint-loader",
+      },
+      {
+        test: /\.js$/,
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
@@ -20,9 +26,9 @@ module.exports = {
           }
         }
       },
-      { 
-        test: /\.css$/, 
-        loader: "style!css" 
+      {
+        test: /\.css$/,
+        loader: "style!css"
       }
     ]
   }

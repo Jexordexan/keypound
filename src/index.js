@@ -1,32 +1,33 @@
-import Context from './context'
+import Context from './context';
 
 export default class Keypound {
   constructor() {
     this.stack = [];
-    document.addEventListener('keydown', (event) => this.onKeyPress(event))
+    document.addEventListener('keydown', (event) => this.onKeyPress(event));
   }
   enter(contextName, options) {
     let context = null;
     const i = this.stack.findIndex(c => c.name === contextName);
     if (i > -1) {
       context = this.moveToTop(i);
-    } else {
+    }
+    else {
       context = this.enterNewContext(contextName, options);
     }
     return context;
   }
   exit(contextName) {
-    const i = this.stack.findIndex(c => c.context === contextName)
+    const i = this.stack.findIndex(c => c.context === contextName);
     if (i > -1) {
-      this.stack.splice(index, 1)
+      this.stack.splice(index, 1);
     }
   }
   onKeyPress(event) {
-    const keyCode = event.keyCodes
-    let i = this.stack.length
-    let handled = false
+    const keyCode = event.keyCodes;
+    let i = this.stack.length;
+    let handled = false;
     while (!handled && i--) {
-      handled = this.stack[i].__dispatch(event)
+      handled = this.stack[i].__dispatch(event);
     }
   }
   moveToTop(index) {
