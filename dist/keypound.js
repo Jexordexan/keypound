@@ -1,13 +1,8 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('babel-runtime/helpers/slicedToArray'), require('babel-runtime/helpers/classCallCheck'), require('babel-runtime/helpers/createClass'), require('babel-runtime/core-js/object/keys')) :
-	typeof define === 'function' && define.amd ? define(['babel-runtime/helpers/slicedToArray', 'babel-runtime/helpers/classCallCheck', 'babel-runtime/helpers/createClass', 'babel-runtime/core-js/object/keys'], factory) :
-	(global.keypound = factory(global._slicedToArray,global._classCallCheck,global._createClass,global._Object$keys));
-}(this, (function (_slicedToArray,_classCallCheck,_createClass,_Object$keys) { 'use strict';
-
-_slicedToArray = _slicedToArray && _slicedToArray.hasOwnProperty('default') ? _slicedToArray['default'] : _slicedToArray;
-_classCallCheck = _classCallCheck && _classCallCheck.hasOwnProperty('default') ? _classCallCheck['default'] : _classCallCheck;
-_createClass = _createClass && _createClass.hasOwnProperty('default') ? _createClass['default'] : _createClass;
-_Object$keys = _Object$keys && _Object$keys.hasOwnProperty('default') ? _Object$keys['default'] : _Object$keys;
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global.keypound = factory());
+}(this, (function () { 'use strict';
 
 var MODIFIERS = {
   '⇧': 16, shift: 16,
@@ -23,7 +18,7 @@ var MODIFIER_MAP = {
   91: 'metaKey'
 };
 
-var MODIFIER_LIST = _Object$keys(MODIFIER_MAP).map(function (keyCode) {
+var MODIFIER_LIST = Object.keys(MODIFIER_MAP).map(function (keyCode) {
   return MODIFIER_MAP[keyCode];
 });
 
@@ -83,11 +78,98 @@ function modifiersMatch(mods, event) {
   });
 }
 
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var slicedToArray = function () {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
+
+    try {
+      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"]) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+
+    return _arr;
+  }
+
+  return function (arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    }
+  };
+}();
+
 var Context = function () {
   function Context(context, master) {
     var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-    _classCallCheck(this, Context);
+    classCallCheck(this, Context);
 
     this.name = context;
     this._block = options.block || false;
@@ -96,7 +178,7 @@ var Context = function () {
     this._bindings = {};
   }
 
-  _createClass(Context, [{
+  createClass(Context, [{
     key: '__dispatch',
     value: function __dispatch(event) {
       if (this._paused) {
@@ -175,7 +257,6 @@ var Context = function () {
       this._paused = false;
     }
   }]);
-
   return Context;
 }();
 
@@ -183,7 +264,7 @@ var Keypound = function () {
   function Keypound() {
     var _this = this;
 
-    _classCallCheck(this, Keypound);
+    classCallCheck(this, Keypound);
 
     this.stack = [];
     document.addEventListener('keydown', function (event) {
@@ -191,7 +272,7 @@ var Keypound = function () {
     });
   }
 
-  _createClass(Keypound, [{
+  createClass(Keypound, [{
     key: 'enter',
     value: function enter(contextName, options) {
       var context = null;
@@ -224,7 +305,7 @@ var Keypound = function () {
     key: 'moveToTop',
     value: function moveToTop(index) {
       var _stack$splice = this.stack.splice(index, 1),
-          _stack$splice2 = _slicedToArray(_stack$splice, 1),
+          _stack$splice2 = slicedToArray(_stack$splice, 1),
           context = _stack$splice2[0];
 
       this.stack.push(context);
@@ -245,7 +326,6 @@ var Keypound = function () {
       });
     }
   }]);
-
   return Keypound;
 }();
 

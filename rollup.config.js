@@ -12,9 +12,8 @@ export default {
       exclude: 'node_modules/**' // only transpile our source code
     }),
     minify({ 
-      iife: {
+      umd: {
         dest: 'dist/keypound.min.js',
-        mangle: false,
         sourceMapUrl: 'dist/keypound.min.js.map'
       }
     })
