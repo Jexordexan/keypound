@@ -1,9 +1,9 @@
-import { code, getKeys, getMods, modifiersMatch } from './code';
+import { code, getKeys, getMods, modifiersMatch } from './utils';
 
 export default class Context {
   constructor(context, master, options = {}) {
     this.name = context;
-    this.block = options.block || false;
+    this._block = options.block || false;
     this._paused = false;
     this._master = master;
     this._bindings = {};
@@ -15,20 +15,16 @@ export default class Context {
     }
 
     const key = event.keyCode;
-    let handled = false;
 
     if (!(key in this._bindings)) {
-      return this.block;
+      return this._block;
     }
 
     this._bindings[key]
       .filter(binding => modifiersMatch(binding.mods, event))
-      .forEach(binding => {
-        binding.handler(event, binding);
-        handled = true;
-      });
+      .forEach(binding => binding.handler(event, binding));
 
-    return handled;
+    return true;
   }
 
   on(shortcut, handler) { // TODO add binding options
@@ -58,14 +54,14 @@ export default class Context {
   }
 
   exit() {
-    this.master.exit(this.context);
+    this._master.exit(this.context);
   }
 
   pause() {
-    this.paused = true;
+    this._paused = true;
   }
 
   play() {
-    this.paused = false;
+    this._paused = false;
   }
 }

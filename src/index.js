@@ -7,7 +7,7 @@ export default class Keypound {
   }
   enter(contextName, options) {
     let context = null;
-    const i = this.stack.findIndex(c => c.name === contextName);
+    const i = this.getStackIndex(contextName);
     if (i > -1) {
       context = this.moveToTop(i);
     }
@@ -17,7 +17,7 @@ export default class Keypound {
     return context;
   }
   exit(contextName) {
-    const i = this.stack.findIndex(c => c.context === contextName);
+    const i = this.getStackIndex(contextName);
     if (i > -1) {
       this.stack.splice(i, 1);
     }
@@ -38,5 +38,8 @@ export default class Keypound {
     const context = new Context(name, this, options);
     this.stack.push(context);
     return context;
+  }
+  getStackIndex(contextName) {
+    return this.stack.findIndex(c => c.name === contextName);
   }
 }

@@ -1,4 +1,4 @@
-import { code, modifiersMatch, getMods, getKeys } from 'src/code';
+import { code, modifiersMatch, getMods, getKeys } from 'src/utils';
 
 describe('Utilities', () => {
   it('should return the correct code', () => {
@@ -8,7 +8,7 @@ describe('Utilities', () => {
     expect(code(';')).toEqual(186);
     expect(code('f11')).toEqual(122);
     expect(code('\\')).toEqual(220);
-  })
+  });
 
   it('should return the correct key bindings', () => {
     const key = 'p, ctrl + v, control + alt + delete';
@@ -23,47 +23,47 @@ describe('Utilities', () => {
       metaKey: false,
       shiftKey: false,
       ctrlKey: true,
-      altKey: false
+      altKey: false,
     });
 
     expect(mods2).toEqual({
       metaKey: false,
       shiftKey: false,
       ctrlKey: true,
-      altKey: true
+      altKey: true,
     });
-  })
+  });
 
   it('should tell if modifiers match', () => {
     const mod1 = {
       metaKey: false,
       shiftKey: false,
       ctrlKey: true,
-      altKey: false
+      altKey: false,
     };
 
     const mod2 = {
       metaKey: false,
       shiftKey: false,
       ctrlKey: true,
-      altKey: false
+      altKey: false,
     };
 
     const mod3 = {
       metaKey: false,
       shiftKey: false,
       ctrlKey: false,
-      altKey: false
+      altKey: false,
     };
 
     const mod4 = {
       metaKey: false,
       shiftKey: false,
-      ctrlKey: true
+      ctrlKey: true,
     };
 
     expect(modifiersMatch(mod1, mod2)).toBe(true);
     expect(modifiersMatch(mod1, mod3)).toBe(false);
     expect(modifiersMatch(mod1, mod4)).toBe(false);
-  })
-})
+  });
+});
