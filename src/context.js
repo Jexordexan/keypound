@@ -27,7 +27,7 @@ export default class Context {
     return true;
   }
 
-  on(shortcut, handler) { // TODO add binding options
+  on(shortcut, handler, options) {
     const keys = getKeys(shortcut);
     keys.forEach(key => {
       let mods = [];
@@ -43,14 +43,24 @@ export default class Context {
         this._bindings[key] = [];
       }
 
-      this._bindings[key].push({ key, handler, mods });
+      this._bindings[key].push({ key, handler, mods, options });
     });
   }
 
   off(shortcut) {
-    if (shortcut) {
-      delete this._bindings[code(shortcut)];
-    }
+    const keys = getKeys(shortcut);
+    keys.forEach(key => {
+      key = key.split('+');
+      if (key.length > 1) {
+        key = [key[key.length - 1]];
+      }
+      key = key[0];
+      key = code(key);
+
+      if (key in this._bindings) {
+        delete this._bindings[key];
+      }
+    });
   }
 
   exit() {

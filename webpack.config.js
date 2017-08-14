@@ -1,3 +1,5 @@
+var path = require('path');
+
 module.exports = {
   entry: "./src/index.js",
   output: {
@@ -5,7 +7,7 @@ module.exports = {
     publicPath: '/',
     library: 'keypound',
     libraryTarget: 'umd',
-    filename: "keypound.js"
+    filename: 'keypound.js'
   },
   devtool: '#cheap-module-eval-source-map',
   module: {
@@ -13,18 +15,14 @@ module.exports = {
       {
         enforce: "pre",
         test: /\.js$/,
+        include: path.resolve('src'),
         exclude: /node_modules/,
         loader: "eslint-loader",
       },
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-          options: {
-            presets: ['env']
-          }
-        }
+        loader: "babel-loader"
       },
       {
         test: /\.css$/,
