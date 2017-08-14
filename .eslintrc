@@ -86,7 +86,6 @@
     "no-throw-literal": 1,
     "no-unused-expressions": 0,
     "no-void": 0,
-    "no-warning-comments": [1, { "terms": ["todo", "tofix"], "location": "start" }],
     "no-with": 1,
     "radix": 1,
     "vars-on-top": 1,
@@ -151,7 +150,6 @@
     "no-unneeded-ternary": 1,
     "object-curly-spacing": 0, // see Babel section
     "one-var": [1, "never"],
-    "operator-assignment": [1, "never"],
     "padded-blocks": [0, "never"],
     "quote-props": [0, "as-needed"],
     "quotes": [1, "single"],

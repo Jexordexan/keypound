@@ -19,11 +19,10 @@ export default class Keypound {
   exit(contextName) {
     const i = this.stack.findIndex(c => c.context === contextName);
     if (i > -1) {
-      this.stack.splice(index, 1);
+      this.stack.splice(i, 1);
     }
   }
   onKeyPress(event) {
-    const keyCode = event.keyCodes;
     let i = this.stack.length;
     let handled = false;
     while (!handled && i--) {

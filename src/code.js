@@ -40,7 +40,7 @@ export function code(x) {
 
 export function getKeys(key) {
   const keys = key.replace(/\s/g, '').split(',');
-  if ((keys[keys.length - 1]) == '') {
+  if ((keys[keys.length - 1]) === '') {
     keys[keys.length - 2] += ',';
   }
   return keys;
@@ -63,5 +63,5 @@ export function getMods(key) {
 }
 
 export function modifiersMatch(mods, event) {
-  return MODIFIER_LIST.every(modName => mods[modName] == event[modName]);
+  return MODIFIER_LIST.every(modName => mods[modName] === event[modName]);
 }

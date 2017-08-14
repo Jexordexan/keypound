@@ -7,10 +7,10 @@
     "build": "NODE_ENV=production webpack ./src/index.js keypound.js",
     "dev": "webpack-dev-server --progress --watch --colors",
     "start": "npm run dev",
-    "unit": "cross-env BABEL_ENV=test karma start test/karma.conf.js --watch",
+    "unit": "cross-env BABEL_ENV=test karma start test/karma.conf.js --single-run",
     "fix": "eslint src/**/*.js --fix",
     "lint": "eslint src/**/*.js",
-    "test": "npm run lint: npm run unit"
+    "test": "npm run lint; npm run unit"
   },
   "keywords": [
     "key",

@@ -15,20 +15,23 @@ export default class Context {
     }
 
     const key = event.keyCode;
+    let handled = false;
 
     if (!(key in this._bindings)) {
       return this.block;
     }
 
-    this._bindings[key].forEach(binding => {
-      if (modifiersMatch(binding.mods, event)) {
+    this._bindings[key]
+      .filter(binding => modifiersMatch(binding.mods, event))
+      .forEach(binding => {
         binding.handler(event, binding);
-        return true;
-      }
-    });
+        handled = true;
+      });
+
+    return handled;
   }
 
-  on(shortcut, handler, options) {
+  on(shortcut, handler) { // TODO add binding options
     const keys = getKeys(shortcut);
     keys.forEach(key => {
       let mods = [];
