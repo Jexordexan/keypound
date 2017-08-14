@@ -11,7 +11,10 @@
     "unit": "cross-env BABEL_ENV=test karma start test/karma.conf.js",
     "fix": "eslint src/**/*.js --fix",
     "lint": "eslint src/**/*.js",
-    "test": "npm run lint; npm run unit -- --single-run"
+    "test": "npm run lint; npm run unit -- --single-run",
+    "preversion": "npm run test",
+    "version": "npm run build",
+    "postversion": "git push && git push --tags"
   },
   "keywords": [
     "key",

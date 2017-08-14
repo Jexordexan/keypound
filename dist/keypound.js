@@ -186,6 +186,7 @@ var Context = function () {
       }
 
       var key = event.keyCode;
+      var handled = false;
 
       if (!(key in this._bindings)) {
         return this._block;
@@ -194,10 +195,14 @@ var Context = function () {
       this._bindings[key].filter(function (binding) {
         return modifiersMatch(binding.mods, event);
       }).forEach(function (binding) {
-        return binding.handler(event, binding);
+        if (binding.options && binding.options.prevent) {
+          event.preventDefault();
+        }
+        binding.handler(event, binding);
+        handled = true;
       });
 
-      return true;
+      return handled;
     }
   }, {
     key: 'on',
@@ -219,7 +224,7 @@ var Context = function () {
           _this._bindings[key] = [];
         }
 
-        _this._bindings[key].push({ key: key, handler: handler, mods: mods, options: options });
+        _this._bindings[key].push({ key: key, handler: handler, mods: mods, options: options, shortcut: shortcut });
       });
     }
   }, {
