@@ -19,8 +19,9 @@ export default class Keypound {
   exit(contextName) {
     const i = this.getStackIndex(contextName);
     if (i > -1) {
-      this.stack.splice(i, 1);
+      return this.stack.splice(i, 1);
     }
+    return null;
   }
   onKeyPress(event) {
     let i = this.stack.length;
