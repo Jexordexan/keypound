@@ -1,8 +1,16 @@
 const webpackConfig = require('./webpack.test.config');
 
-module.exports = (config) => {
+module.exports = config => {
   config.set({
-    browsers: ['ChromeHeadless'],
+    browsers: ['ChromeHeadlessNoSandbox'],
+
+    // you can define custom flags
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox'],
+      },
+    },
     frameworks: ['phantomjs-shim', 'jasmine'],
     reporters: ['spec', 'coverage', 'remap-coverage'],
     files: ['./index.js'],
