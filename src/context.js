@@ -1,8 +1,9 @@
-import { code, getKeys, getMods, modifiersMatch } from './utils';
+import { getKeys, modifiersMatch, parseKey } from './utils';
 
 export default class Context {
   constructor(context, master, options = {}) {
     this.name = context;
+    this._filter = options.filter;
     this._block = options.block || false;
     this._paused = false;
     this._master = master;
@@ -21,15 +22,17 @@ export default class Context {
       return this._block;
     }
 
-    this._bindings[key]
-      .filter(binding => modifiersMatch(binding.mods, event))
-      .forEach(binding => {
-        if (binding.options && binding.options.prevent) {
-          event.preventDefault();
-        }
-        binding.handler(event, binding);
-        handled = true;
-      });
+    this._bindings[key].filter(binding => modifiersMatch(binding.mods, event)).forEach(binding => {
+      if (typeof this._filter === 'function' && !this._filter(event)) {
+        return;
+      }
+      if (binding.options && binding.options.prevent) {
+        event.preventDefault();
+      }
+      // console.log('triggering');
+      binding.handler(event, binding);
+      handled = true;
+    });
 
     return handled;
   }
@@ -37,14 +40,13 @@ export default class Context {
   on(shortcut, handler, options) {
     const keys = getKeys(shortcut);
     keys.forEach(key => {
-      let mods = [];
-      key = key.split('+');
-      mods = getMods(key);
-      if (key.length > 1) {
-        key = [key[key.length - 1]];
+      if (key in this._master.aliases) {
+        key = this._master.aliases[key];
       }
-      key = key[0];
-      key = code(key);
+
+      const parsed = parseKey(key);
+      const mods = parsed.mods;
+      key = parsed.key;
 
       if (!(key in this._bindings)) {
         this._bindings[key] = [];
@@ -54,18 +56,21 @@ export default class Context {
     });
   }
 
-  off(shortcut) {
+  off(shortcut, handler) {
     const keys = getKeys(shortcut);
     keys.forEach(key => {
-      key = key.split('+');
-      if (key.length > 1) {
-        key = [key[key.length - 1]];
-      }
-      key = key[0];
-      key = code(key);
-
-      if (key in this._bindings) {
-        delete this._bindings[key];
+      const parsed = parseKey(key);
+      if (parsed.key in this._bindings) {
+        const bindings = this._bindings[parsed.key];
+        if (handler !== undefined) {
+          const deleteIndex = bindings.findIndex(binding => binding.handler === handler);
+          if (deleteIndex > -1) {
+            bindings.splice(deleteIndex, 1);
+          }
+        }
+        else {
+          delete this._bindings[parsed.key];
+        }
       }
     });
   }

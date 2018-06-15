@@ -1,21 +1,23 @@
 import Keypound from 'src';
-import { code, MODIFIER_LIST } from 'src/utils';
-
-function keyPress(key, mods = []) {
-  const event = document.createEvent('Event');
-  event.keyCode = key;
-  MODIFIER_LIST.forEach(mod => { event[mod] = mods.includes(mod); });
-  event.initEvent('keydown');
-  document.dispatchEvent(event);
-}
+import { code } from 'src/utils';
+import { keyPress } from './helpers';
 
 describe('Keypound', () => {
+  let filterSpy;
   let master;
   let floor1;
   let floor2;
 
   beforeEach(() => {
-    master = new Keypound();
+    filterSpy = jasmine.createSpy('filter');
+    filterSpy.and.returnValue(true);
+    master = new Keypound({
+      defaultFilter: filterSpy,
+    });
+  });
+
+  afterEach(() => {
+    master.destroy();
   });
 
   it('should create an instance', () => {
@@ -32,101 +34,167 @@ describe('Keypound', () => {
 
   it('should not trigger an event with the wrong mods', () => {
     floor1 = master.enter('floor1');
-    const bspy = jasmine.createSpy('bpress');
-    const ctrlbspy = jasmine.createSpy('ctrlbpress');
-    floor1.on('b', e => bspy(e));
-    floor1.on('ctrl + b', e => ctrlbspy(e));
-    keyPress(code('b'), ['ctrlKey']);
-    expect(bspy).not.toHaveBeenCalled();
-    expect(ctrlbspy).toHaveBeenCalled();
+    const cspy = jasmine.createSpy('cpress');
+    const ctrlcspy = jasmine.createSpy('ctrlcpress');
+    floor1.on('c', e => cspy(e));
+    floor1.on('ctrl + c', e => ctrlcspy(e));
+    keyPress(code('c'), ['ctrlKey']);
+    expect(cspy).not.toHaveBeenCalled();
+    expect(ctrlcspy).toHaveBeenCalled();
   });
 
-  it('should not trigger an event after being unbound', () => {
+  it('should not trigger an event after being unbound by shortcut', () => {
     floor1 = master.enter('floor1');
-    const bspy = jasmine.createSpy('bpress');
-    const ctrlbspy = jasmine.createSpy('ctrlbpress');
-    floor1.on('b', e => bspy(e));
-    floor1.on('ctrl + b', e => ctrlbspy(e));
-    keyPress(code('b'), ['ctrlKey']);
-    expect(bspy).not.toHaveBeenCalled();
-    expect(ctrlbspy).toHaveBeenCalled();
+    const dspy = jasmine.createSpy('dpress');
+    const ctrldspy = jasmine.createSpy('ctrldpress');
+    floor1.on('d', e => dspy(e));
+    floor1.on('ctrl + d', e => ctrldspy(e));
+    keyPress(code('d'), ['ctrlKey']);
+    expect(dspy).not.toHaveBeenCalled();
+    expect(ctrldspy).toHaveBeenCalled();
 
-    floor1.off('b');
-    keyPress(code('b'));
-    expect(bspy).not.toHaveBeenCalled();
+    floor1.off('d');
+    keyPress(code('d'));
+    expect(dspy).not.toHaveBeenCalled();
+  });
+
+  it('should not trigger an event after being unbound by handler', () => {
+    floor1 = master.enter('floor1');
+    const spy1 = jasmine.createSpy('keypress1');
+    const spy2 = jasmine.createSpy('keypress2');
+    floor1.on('e', spy1);
+    floor1.on('e', spy2);
+    floor1.off('e', null);
+    keyPress(code('e'));
+    expect(spy1).toHaveBeenCalled();
+    expect(spy2).toHaveBeenCalled();
+
+    spy1.calls.reset();
+    spy2.calls.reset();
+
+    floor1.off('e', spy2);
+    keyPress(code('e'));
+    expect(spy1).toHaveBeenCalled();
+    expect(spy2).not.toHaveBeenCalled();
   });
 
   it('should not trigger an event after being handled', () => {
     floor1 = master.enter('floor1');
-    const bspy1 = jasmine.createSpy('bpress1');
-    floor1.on('b', e => bspy1(e));
-    keyPress(code('b'));
-    expect(bspy1).toHaveBeenCalled();
+    const spy1 = jasmine.createSpy('keypress1');
+    floor1.on('f', e => spy1(e));
+    keyPress(code('f'));
+    expect(spy1).toHaveBeenCalled();
 
-    bspy1.calls.reset();
-    const bspy2 = jasmine.createSpy('bpress2');
+    spy1.calls.reset();
+    const spy2 = jasmine.createSpy('keypress2');
 
     floor2 = master.enter('floor2');
-    floor2.on('b', e => bspy2(e));
-    keyPress(code('b'));
-    expect(bspy1).not.toHaveBeenCalled();
-    expect(bspy2).toHaveBeenCalled();
+    floor2.on('f', e => spy2(e));
+    keyPress(code('f'));
+    expect(spy1).not.toHaveBeenCalled();
+    expect(spy2).toHaveBeenCalled();
 
-    bspy1.calls.reset();
-    bspy2.calls.reset();
+    spy1.calls.reset();
+    spy2.calls.reset();
 
     floor2.exit();
-    keyPress(code('b'));
-    expect(bspy1).toHaveBeenCalled();
-    expect(bspy2).not.toHaveBeenCalled();
+    keyPress(code('f'));
+    expect(spy1).toHaveBeenCalled();
+    expect(spy2).not.toHaveBeenCalled();
   });
 
   it('should trigger an event after being re-entered', () => {
     floor1 = master.enter('floor1');
-    const bspy1 = jasmine.createSpy('bpress1');
-    floor1.on('b', e => bspy1(e));
-    keyPress(code('b'));
-    expect(bspy1).toHaveBeenCalled();
+    const spy1 = jasmine.createSpy('keypress1');
+    floor1.on('g', e => spy1(e));
+    keyPress(code('g'));
+    expect(spy1).toHaveBeenCalled();
 
-    bspy1.calls.reset();
-    const bspy2 = jasmine.createSpy('bpress2');
+    spy1.calls.reset();
+    const spy2 = jasmine.createSpy('keypress2');
 
     floor2 = master.enter('floor2');
-    floor2.on('b', e => bspy2(e));
-    keyPress(code('b'));
-    expect(bspy1).not.toHaveBeenCalled();
-    expect(bspy2).toHaveBeenCalled();
+    floor2.on('g', e => spy2(e));
+    keyPress(code('g'));
+    expect(spy1).not.toHaveBeenCalled();
+    expect(spy2).toHaveBeenCalled();
 
-    bspy1.calls.reset();
-    bspy2.calls.reset();
+    spy1.calls.reset();
+    spy2.calls.reset();
 
     master.enter('floor1');
-    keyPress(code('b'));
-    expect(bspy1).toHaveBeenCalled();
-    expect(bspy2).not.toHaveBeenCalled();
+    keyPress(code('g'));
+    expect(spy1).toHaveBeenCalled();
+    expect(spy2).not.toHaveBeenCalled();
   });
 
   it('should not trigger an event after being paused', () => {
     floor1 = master.enter('floor1');
-    const bspy1 = jasmine.createSpy('bpress1');
-    floor1.on('b', e => bspy1(e));
+    const spy1 = jasmine.createSpy('keypress1');
+    floor1.on('h', e => spy1(e));
     floor1.pause();
-    keyPress(code('b'));
-    expect(bspy1).not.toHaveBeenCalled();
-    keyPress(code('b'));
+    keyPress(code('h'));
+    expect(spy1).not.toHaveBeenCalled();
+    keyPress(code('h'));
     floor1.play();
-    keyPress(code('b'));
-    expect(bspy1).toHaveBeenCalled();
+    keyPress(code('h'));
+    expect(spy1).toHaveBeenCalled();
   });
 
   it('should trigger if shortcut is unique', () => {
     floor1 = master.enter('floor1');
     floor2 = master.enter('floor2');
-    const bspy1 = jasmine.createSpy('bpress1');
-    const bspy2 = jasmine.createSpy('bpress2');
-    floor1.on('b', e => bspy1(e));
-    floor2.on('ctrl + b', e => bspy2(e));
-    keyPress(code('b'));
-    expect(bspy1).toHaveBeenCalled();
+    const spy1 = jasmine.createSpy('keypress1');
+    const spy2 = jasmine.createSpy('keypress2');
+    floor1.on('i', e => spy1(e));
+    floor2.on('ctrl + i', e => spy2(e));
+    keyPress(code('i'));
+    expect(spy1).toHaveBeenCalled();
+  });
+
+  it('should correctly filter events', () => {
+    const filter = jasmine.createSpy('inner filter');
+    filter.and.returnValue(false);
+
+    floor1 = master.enter('floor1');
+    floor2 = master.enter('floor2', { filter });
+    const spy1 = jasmine.createSpy('keypress1');
+    const spy2 = jasmine.createSpy('keypress2');
+    floor1.on('j', e => spy1(e));
+    floor2.on('j', e => spy2(e));
+    keyPress(code('j'));
+    expect(filter).toHaveBeenCalled();
+    expect(spy1).toHaveBeenCalled();
+    expect(spy2).not.toHaveBeenCalled();
+  });
+
+  it('should correctly alias shortcuts', () => {
+    master.createAlias('alias', 'k');
+    expect(() => {
+      master.createAlias('command', 'ctrl + k');
+    }).toThrow(new Error('Bad alias: \'command\' is reserved'));
+
+    floor1 = master.enter('floor1');
+    const spy1 = jasmine.createSpy('keypress1');
+    floor1.on('alias', e => spy1(e));
+    keyPress(code('k'));
+    expect(spy1).toHaveBeenCalled();
+  });
+
+  it('should properly unbind listeners when destroyed', () => {
+    let tempMaster = new Keypound();
+    floor1 = tempMaster.enter('floor1');
+    const spy1 = jasmine.createSpy('keypress1');
+    floor1.on('k', e => spy1(e));
+    keyPress(code('k'));
+    expect(spy1).toHaveBeenCalled();
+
+    spy1.calls.reset();
+
+    tempMaster.destroy();
+    tempMaster = null;
+
+    keyPress(code('k'));
+    expect(spy1).not.toHaveBeenCalled();
   });
 });

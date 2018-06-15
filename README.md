@@ -28,7 +28,7 @@ To get started with keypound, you'll need to create a master instance:
 // master.js
 import Keypound from 'keypound'
 
-const master = new Keypound()
+const master = new Keypound(options)
 export default master
 ```
 
@@ -101,7 +101,17 @@ You should really only have one of these in your app. If you need more, make sur
 
 ### Constructor
 ```javascript
-const master = new Keypound();
+const master = new Keypound(options);
+```
+
+### Options
+When creating a new Keypound, you can provide the following options
+```javascript
+{
+  keyEvent: 'keydown', // the event type to listen for
+  createRoot: true, // create a root context for the app
+  defaultFilter: (event, binding) => boolean, // a global function to filter events, can be overridden by each context
+}
 ```
 ### Methods
 * `enter(contextName, options)`
@@ -115,6 +125,7 @@ const master = new Keypound();
 When creating a new context, you can supply options for how shortcuts are handled:
 
 * `block: boolean`: if true, stops all shortcuts at this context, even if they have no handler.
+* `filter: (event, binding) => boolean`: Local filter for events in this context, defaults to the defualtFilter set in the master.
 
 ## Context instance
 
@@ -166,3 +177,5 @@ To contribute, please fork Keypound.js, add your patch and tests for it (in the 
 - More docs
 - More examples
 - Better edge-case testing
+- Filtering
+- Aliases

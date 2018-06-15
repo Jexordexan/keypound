@@ -72,6 +72,18 @@ function getMods(key) {
   return _mods;
 }
 
+function parseKey(key) {
+  var mods = [];
+  key = key.split('+');
+  mods = getMods(key);
+  if (key.length > 1) {
+    key = [key[key.length - 1]];
+  }
+  key = key[0];
+  key = code(key);
+  return { key: key, mods: mods };
+}
+
 function modifiersMatch(mods, event) {
   return MODIFIER_LIST.every(function (modName) {
     return mods[modName] === event[modName];
@@ -172,6 +184,7 @@ var Context = function () {
     classCallCheck(this, Context);
 
     this.name = context;
+    this._filter = options.filter;
     this._block = options.block || false;
     this._paused = false;
     this._master = master;
@@ -181,6 +194,8 @@ var Context = function () {
   createClass(Context, [{
     key: '__dispatch',
     value: function __dispatch(event) {
+      var _this = this;
+
       if (this._paused) {
         return false;
       }
@@ -195,9 +210,13 @@ var Context = function () {
       this._bindings[key].filter(function (binding) {
         return modifiersMatch(binding.mods, event);
       }).forEach(function (binding) {
+        if (typeof _this._filter === 'function' && !_this._filter(event)) {
+          return;
+        }
         if (binding.options && binding.options.prevent) {
           event.preventDefault();
         }
+        // console.log('triggering');
         binding.handler(event, binding);
         handled = true;
       });
@@ -207,42 +226,45 @@ var Context = function () {
   }, {
     key: 'on',
     value: function on(shortcut, handler, options) {
-      var _this = this;
-
-      var keys = getKeys(shortcut);
-      keys.forEach(function (key) {
-        var mods = [];
-        key = key.split('+');
-        mods = getMods(key);
-        if (key.length > 1) {
-          key = [key[key.length - 1]];
-        }
-        key = key[0];
-        key = code(key);
-
-        if (!(key in _this._bindings)) {
-          _this._bindings[key] = [];
-        }
-
-        _this._bindings[key].push({ key: key, handler: handler, mods: mods, options: options, shortcut: shortcut });
-      });
-    }
-  }, {
-    key: 'off',
-    value: function off(shortcut) {
       var _this2 = this;
 
       var keys = getKeys(shortcut);
       keys.forEach(function (key) {
-        key = key.split('+');
-        if (key.length > 1) {
-          key = [key[key.length - 1]];
+        if (key in _this2._master.aliases) {
+          key = _this2._master.aliases[key];
         }
-        key = key[0];
-        key = code(key);
 
-        if (key in _this2._bindings) {
-          delete _this2._bindings[key];
+        var parsed = parseKey(key);
+        var mods = parsed.mods;
+        key = parsed.key;
+
+        if (!(key in _this2._bindings)) {
+          _this2._bindings[key] = [];
+        }
+
+        _this2._bindings[key].push({ key: key, handler: handler, mods: mods, options: options, shortcut: shortcut });
+      });
+    }
+  }, {
+    key: 'off',
+    value: function off(shortcut, handler) {
+      var _this3 = this;
+
+      var keys = getKeys(shortcut);
+      keys.forEach(function (key) {
+        var parsed = parseKey(key);
+        if (parsed.key in _this3._bindings) {
+          var bindings = _this3._bindings[parsed.key];
+          if (handler !== undefined) {
+            var deleteIndex = bindings.findIndex(function (binding) {
+              return binding.handler === handler;
+            });
+            if (deleteIndex > -1) {
+              bindings.splice(deleteIndex, 1);
+            }
+          } else {
+            delete _this3._bindings[parsed.key];
+          }
         }
       });
     }
@@ -269,15 +291,42 @@ var Keypound = function () {
   function Keypound() {
     var _this = this;
 
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     classCallCheck(this, Keypound);
 
     this.stack = [];
-    document.addEventListener('keydown', function (event) {
+    this.aliases = {};
+    this.keyEvent = options.keyEvent || 'keydown';
+    this.filter = options.defaultFilter || function (event) {
+      return event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'TEXTAREA';
+    };
+    this.__globalHandler = function (event) {
       return _this.onKeyPress(event);
-    });
+    };
+    document.addEventListener(this.keyEvent, this.__globalHandler);
+
+    if (options.createRoot || typeof options.createRoot === 'undefined') {
+      this.enter('root');
+    }
   }
 
   createClass(Keypound, [{
+    key: 'createAlias',
+    value: function createAlias(alias, key) {
+      // TODO Write validator for shortcut
+      var validAlias = !(alias in MAP) && !(alias in MODIFIERS);
+      if (!validAlias) {
+        throw new Error('Bad alias: \'' + alias + '\' is reserved');
+      }
+
+      var validKey = true;
+      if (!validKey) {
+        throw new Error('Bad key: \'' + key + '\' is incorrectly formatted');
+      }
+
+      this.aliases[alias] = key;
+    }
+  }, {
     key: 'enter',
     value: function enter(contextName, options) {
       var context = null;
@@ -294,8 +343,9 @@ var Keypound = function () {
     value: function exit(contextName) {
       var i = this.getStackIndex(contextName);
       if (i > -1) {
-        this.stack.splice(i, 1);
+        return this.stack.splice(i, 1);
       }
+      return null;
     }
   }, {
     key: 'onKeyPress',
@@ -318,7 +368,10 @@ var Keypound = function () {
     }
   }, {
     key: 'enterNewContext',
-    value: function enterNewContext(name, options) {
+    value: function enterNewContext(name) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      options.filter = options.filter || this.filter;
       var context = new Context(name, this, options);
       this.stack.push(context);
       return context;
@@ -329,6 +382,11 @@ var Keypound = function () {
       return this.stack.findIndex(function (c) {
         return c.name === contextName;
       });
+    }
+  }, {
+    key: 'destroy',
+    value: function destroy() {
+      document.removeEventListener(this.keyEvent, this.__globalHandler);
     }
   }]);
   return Keypound;

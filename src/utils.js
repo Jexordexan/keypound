@@ -64,6 +64,18 @@ export function getMods(key) {
   return _mods;
 }
 
+export function parseKey(key) {
+  let mods = [];
+  key = key.split('+');
+  mods = getMods(key);
+  if (key.length > 1) {
+    key = [key[key.length - 1]];
+  }
+  key = key[0];
+  key = code(key);
+  return { key, mods };
+}
+
 export function modifiersMatch(mods, event) {
   return MODIFIER_LIST.every(modName => mods[modName] === event[modName]);
 }
